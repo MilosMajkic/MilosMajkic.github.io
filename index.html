@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miloš Majkić | Fullstack Developer</title>
+    <meta name="description" content="Portfolio of Miloš Majkić - Fullstack Developer">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1/bundled/lenis.min.js"></script>
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: auto;
+        }
+        
+        body {
+            background: #09090b;
+            color: #fafafa;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            border: 2px solid var(--accent, #3b82f6);
+            transition: transform 0.2s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            background: var(--accent, #3b82f6);
+            transition: transform 0.1s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Shimmer Effect */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #09090b;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .preloader-logo {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+        
+        .preloader-counter {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+        }
+        
+        /* Text Reveal */
+        .text-reveal {
+            overflow: hidden;
+        }
+        
+        .text-reveal span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+        
+        /* Navigation */
+        .nav-pill {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .nav-pill.hidden {
+            transform: translateX(-50%) translateY(-150%);
+        }
+        
+        /* Accent Colors */
+        :root {
+            --accent: #3b82f6;
+        }
+        
+        .accent-blue {
+            --accent: #3b82f6;
+        }
+        
+        .accent-purple {
+            --accent: #a855f7;
+        }
+        
+        .accent-emerald {
+            --accent: #10b981;
+        }
+        
+        /* 3D Canvas */
+        #canvas-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Contact Modal */
+        .contact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .contact-modal.active {
+            display: flex;
+        }
+        
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            z-index: 10002;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* Skills Grid */
+        .skill-category {
+            margin-bottom: 2rem;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-logo" id="preloader-logo">MM</div>
+        <div class="preloader-counter" id="preloader-counter">0%</div>
+    </div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-trail" id="cursor-trail"></div>
+    
+    <!-- 3D Canvas -->
+    <canvas id="canvas-3d"></canvas>
+    
+    <!-- Navigation -->
+    <nav class="nav-pill glass rounded-full px-8 py-4" id="nav">
+        <div class="flex items-center gap-8">
+            <a href="#hero" class="nav-link text-sm font-medium hover:opacity-70 transition-opacity">Home</a>
+            <a href="#projects" class="nav-link text-sm font-medium hover:opacity-70 transition-opacity">Projects</a>
+            <a href="#about" class="nav-link text-sm font-medium hover:opacity-70 transition-opacity">About</a>
+            <a href="#contact" class="nav-link text-sm font-medium hover:opacity-70 transition-opacity">Contact</a>
+            <div class="w-px h-6 bg-white/20"></div>
+            <button id="color-toggle" class="text-sm font-medium hover:opacity-70 transition-opacity cursor-pointer" title="Change accent color">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="3" fill="currentColor" class="transition-colors" style="color: var(--accent);"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center justify-center px-6 relative">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="text-reveal mb-6">
+                <h1 class="text-6xl md:text-8xl lg:text-9xl font-black leading-tight">
+                    <span>Fullstack</span>
+                    <br>
+                    <span>Developer</span>
+                </h1>
+            </div>
+            <div class="text-reveal mb-8">
+                <p class="text-xl md:text-2xl text-zinc-400 font-light">
+                    <span>Miloš Majkić</span>
+                </p>
+            </div>
+            <div class="text-reveal">
+                <a href="#projects" class="inline-block glass rounded-full px-8 py-4 text-sm font-medium hover:scale-105 transition-transform magnetic-btn">
+                    <span>Explore Work</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section id="projects" class="min-h-screen py-32 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-reveal mb-20">
+                <h2 class="text-5xl md:text-7xl font-black mb-4">
+                    <span>Selected</span>
+                    <br>
+                    <span>Projects</span>
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Project 1 -->
+                <div class="project-card glass rounded-2xl p-8 hover:scale-[1.02] transition-transform duration-300 shimmer group cursor-pointer" data-github="https://github.com/milosmajkic">
+                    <div class="aspect-video bg-zinc-800 rounded-lg mb-6 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Project Alpha</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">A cutting-edge web application showcasing modern design principles and advanced interactivity.</p>
+                    <a href="https://github.com/milosmajkic" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all magnetic-btn">
+                        <span>View on GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="project-card glass rounded-2xl p-8 hover:scale-[1.02] transition-transform duration-300 shimmer group cursor-pointer" data-github="https://github.com/milosmajkic">
+                    <div class="aspect-video bg-zinc-800 rounded-lg mb-6 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" alt="Project 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Project Beta</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">An innovative platform combining data visualization with immersive user experiences.</p>
+                    <a href="https://github.com/milosmajkic" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all magnetic-btn">
+                        <span>View on GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="project-card glass rounded-2xl p-8 hover:scale-[1.02] transition-transform duration-300 shimmer group cursor-pointer" data-github="https://github.com/milosmajkic">
+                    <div class="aspect-video bg-zinc-800 rounded-lg mb-6 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" alt="Project 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Project Gamma</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">A revolutionary interface design pushing the boundaries of digital interaction.</p>
+                    <a href="https://github.com/milosmajkic" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all magnetic-btn">
+                        <span>View on GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Project 4 -->
+                <div class="project-card glass rounded-2xl p-8 hover:scale-[1.02] transition-transform duration-300 shimmer group cursor-pointer md:col-span-2" data-github="https://github.com/milosmajkic">
+                    <div class="aspect-video bg-zinc-800 rounded-lg mb-6 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop" alt="Project 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Project Delta</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">A comprehensive solution integrating multiple technologies to create seamless user journeys.</p>
+                    <a href="https://github.com/milosmajkic" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all magnetic-btn">
+                        <span>View on GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Project 5 -->
+                <div class="project-card glass rounded-2xl p-8 hover:scale-[1.02] transition-transform duration-300 shimmer group cursor-pointer" data-github="https://github.com/milosmajkic">
+                    <div class="aspect-video bg-zinc-800 rounded-lg mb-6 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" alt="Project 5" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Project Epsilon</h3>
+                    <p class="text-zinc-400 mb-6 text-sm leading-relaxed">An elegant showcase of minimalist design meeting powerful functionality.</p>
+                    <a href="https://github.com/milosmajkic" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all magnetic-btn">
+                        <span>View on GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="min-h-screen py-32 px-6 flex items-center">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-reveal mb-12">
+                <h2 class="text-5xl md:text-7xl font-black mb-8">
+                    <span>About</span>
+                </h2>
+            </div>
+            <div class="text-reveal mb-12">
+                <p class="text-xl md:text-2xl text-zinc-400 font-light leading-relaxed mb-12">
+                    <span>Passionate fullstack developer crafting immersive digital experiences at the intersection of design and technology.</span>
+                </p>
+            </div>
+            
+            <!-- Skills Section -->
+            <div class="space-y-8">
+                <!-- Languages -->
+                <div class="skill-category">
+                    <h3 class="text-2xl font-bold mb-4 text-reveal">
+                        <span>Languages</span>
+                    </h3>
+                    <div class="flex flex-wrap">
+                        <span class="skill-tag glass text-reveal"><span>C#</span></span>
+                        <span class="skill-tag glass text-reveal"><span>HTML</span></span>
+                        <span class="skill-tag glass text-reveal"><span>CSS</span></span>
+                        <span class="skill-tag glass text-reveal"><span>JavaScript</span></span>
+                        <span class="skill-tag glass text-reveal"><span>Python</span></span>
+                    </div>
+                </div>
+                
+                <!-- Frontend -->
+                <div class="skill-category">
+                    <h3 class="text-2xl font-bold mb-4 text-reveal">
+                        <span>Frontend</span>
+                    </h3>
+                    <div class="flex flex-wrap">
+                        <span class="skill-tag glass text-reveal"><span>React</span></span>
+                        <span class="skill-tag glass text-reveal"><span>Tailwind CSS</span></span>
+                    </div>
+                </div>
+                
+                <!-- Backend -->
+                <div class="skill-category">
+                    <h3 class="text-2xl font-bold mb-4 text-reveal">
+                        <span>Backend</span>
+                    </h3>
+                    <div class="flex flex-wrap">
+                        <span class="skill-tag glass text-reveal"><span>Node.js</span></span>
+                    </div>
+                </div>
+                
+                <!-- Database -->
+                <div class="skill-category">
+                    <h3 class="text-2xl font-bold mb-4 text-reveal">
+                        <span>Database</span>
+                    </h3>
+                    <div class="flex flex-wrap">
+                        <span class="skill-tag glass text-reveal"><span>SQL</span></span>
+                        <span class="skill-tag glass text-reveal"><span>PostgreSQL</span></span>
+                        <span class="skill-tag glass text-reveal"><span>MySQL</span></span>
+                    </div>
+                </div>
+                
+                <!-- Other -->
+                <div class="skill-category">
+                    <h3 class="text-2xl font-bold mb-4 text-reveal">
+                        <span>Other</span>
+                    </h3>
+                    <div class="flex flex-wrap">
+                        <span class="skill-tag glass text-reveal"><span>API</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="min-h-screen py-32 px-6 flex items-center">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-reveal mb-12">
+                <h2 class="text-5xl md:text-7xl font-black mb-8">
+                    <span>Let's</span>
+                    <br>
+                    <span>Connect</span>
+                </h2>
+            </div>
+            <div class="text-reveal">
+                <button id="open-contact" class="inline-block glass rounded-full px-12 py-6 text-lg font-medium hover:scale-105 transition-transform magnetic-btn">
+                    <span>Get in Touch</span>
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Modal -->
+    <div class="contact-modal" id="contact-modal">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-content glass rounded-2xl p-8 md:p-12">
+            <button class="modal-close glass" id="close-modal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <h2 class="text-4xl md:text-5xl font-black mb-8">Get in Touch</h2>
+            
+            <form id="contact-form" class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium mb-2">Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        required
+                        class="w-full px-4 py-3 glass rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 focus:ring-[var(--accent)] transition-all"
+                        placeholder="Your name"
+                    >
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required
+                        class="w-full px-4 py-3 glass rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 focus:ring-[var(--accent)] transition-all"
+                        placeholder="your.email@example.com"
+                    >
+                </div>
+                
+                <div>
+                    <label for="message" class="block text-sm font-medium mb-2">Message</label>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        required
+                        rows="6"
+                        class="w-full px-4 py-3 glass rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 focus:ring-[var(--accent)] transition-all resize-none"
+                        placeholder="Your message..."
+                    ></textarea>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    id="submit-btn"
+                    class="w-full glass rounded-full px-8 py-4 text-sm font-medium hover:scale-105 transition-transform magnetic-btn"
+                >
+                    <span id="submit-text">Send Message</span>
+                    <span id="submit-loading" class="hidden">Sending...</span>
+                </button>
+                
+                <div id="form-message" class="hidden text-center text-sm mt-4"></div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+
